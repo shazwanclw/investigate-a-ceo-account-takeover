@@ -13,7 +13,7 @@
 
 ## 1. Executive summary
 
-Over three nights, an attacker tested common passwords against 26 company accounts using IP addresses from Nigeria. On the morning of August 10, they cracked the passwords for both the CEO (Daniel Reeve) and an employee (Priya Nair). On the CEO's account, the attacker added their own phone as an MFA method and set up a rule to hide invoice emails. The team spotted the login when Daniel signed in from London a few hours later. We ended all active sessions, changed passwords, deleted the attacker's MFA device and email rule, and blocked the IPs. No company funds were lost, and we flagged the other 24 accounts that were targeted so they can reset their passwords too.
+Over three nights, an attacker tested common passwords against 26 company accounts using IP addresses from Nigeria. On the morning of August 10, they cracked the passwords for both the CEO (Daniel Reeve) and an employee (Priya Nair). On the CEO's account, the attacker added their own phone as an MFA method and set up a rule to hide invoice emails. The team spotted the login when Daniel signed in from London a few hours later. We ended all active sessions, changed passwords, deleted the attacker's MFA device and email rule, and blocked the IPs. No fraud or payment activity was identified in the supplied logs, and we flagged the other 24 accounts that were targeted so they can reset their passwords too.
 
 ## 2. Incident timeline
 
@@ -50,7 +50,7 @@ All times are in UTC. Data comes from sign-in logs (`CloudoraSignIn_CL`) and aud
 
 ### Finding 2: Entry was gained through a slow password spray
 
-**Fact:** The attacker did not use phishing; they guessed passwords across many users over three days.
+**Fact:** The available sign-in evidence supports a slow password-spray attack against many users over three days.
 
 **Evidence:** In the sign-in logs, three IPs from Lagos (`102.89.44.17`, `102.89.44.23`, `102.89.45.101`) made 114 failed attempts across 26 different accounts between midnight and 5 AM. Each account was only tried 1 to 3 times per night.
 
@@ -78,7 +78,7 @@ All times are in UTC. Data comes from sign-in logs (`CloudoraSignIn_CL`) and aud
 
 **Evidence:** The same IP pool got into `priya.nair@cloudora.io` at 03:47 UTC, and opened SharePoint five minutes later.
 
-**Why it matters:** Looking past the first alert showed that another staff member was breached and had internal files opened.
+**Why it matters:** Looking past the first alert showed that another staff member was breached and had internal files opened. No attacker persistence was observed for Priya in the available audit logs; this is not proof that the account was clean, so the same containment steps are still required.
 
 ### Finding 6: Omar Farah's logins were legitimate travel
 

@@ -1,7 +1,5 @@
 # CEO Account Takeover Investigation
 
-> **Simulated SOC engagement - MyFirstHack training project.** Cloudora is fictional and the logs, accounts, IPs, and evidence shown here are synthetic. This is a portfolio case study, not a real client engagement or employment record.
-
 ## Case overview
 
 Cloudora's IT administrator opened a P1 ticket after CEO Daniel Reeve appeared to sign in from Lagos at 03:12 UTC while normally working from London. The account was being used days before an important client deal, so the investigation needed to establish whether the alert was a real takeover, identify what the intruder changed, and determine whether the activity reached other users.
@@ -156,10 +154,11 @@ All KQL is in [Queries Used](<Queries%20Used>). The tables must be named `Cloudo
 
 ## Deliverables
 
-- [Incident report](<Report/incident-report.md>)
+- [Incident report (PDF)](<Report/incident-report.pdf>)
+- [Incident report (Markdown)](<Report/incident-report.md>)
 - [Query pack](<Queries%20Used>)
 - [Evidence screenshots](<Screenshot%20Result>)
 
 ## Attribution and responsible use
 
-This project is based on the Cloudora CLD-0001 learning scenario from the MyFirstHack community. The training material supplied the fictional scenario, data, report template, and guided exercises. This repository contains my investigation outputs and portfolio presentation only; it does not redistribute source data or answer-key files.
+This project is based on the Cloudora CLD-0001 learning scenario from the MyFirstHack community. The training material supplied the scenario, data, report template, and guided exercises. This repository contains my investigation outputs and portfolio presentation only; it does not redistribute source data or answer-key files.
