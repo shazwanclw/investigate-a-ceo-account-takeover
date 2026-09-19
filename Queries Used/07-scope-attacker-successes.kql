@@ -1,0 +1,5 @@
+// Purpose: List successful authentication events from attacker infrastructure.
+CloudoraSignIn_CL
+| where IPAddress startswith "102.89." and ResultType == "0"
+| project TimeGenerated, UserPrincipalName, AppDisplayName, IPAddress, City, Country
+| order by TimeGenerated asc

@@ -1,0 +1,6 @@
+// Purpose: Check the available audit data for post-compromise persistence.
+// A lack of matching audit events is not proof that the account is clean.
+CloudoraAudit_CL
+| where TargetUser == "priya.nair@cloudora.io"
+| project TimeGenerated, ActivityDisplayName, InitiatedBy, IPAddress, Details
+| order by TimeGenerated asc

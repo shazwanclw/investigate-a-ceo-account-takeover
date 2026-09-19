@@ -1,0 +1,10 @@
+// Purpose: Inventory spray targets that have failures but no attacker-IP success.
+// Use this result to drive precautionary password resets.
+let BreachedAccounts = CloudoraSignIn_CL
+    | where IPAddress startswith "102.89." and ResultType == "0"
+    | distinct UserPrincipalName;
+CloudoraSignIn_CL
+| where IPAddress startswith "102.89." and ResultType == "50126"
+| where UserPrincipalName !in (BreachedAccounts)
+| summarize FailedAttempts=count(), FirstAttempt=min(TimeGenerated), LastAttempt=max(TimeGenerated) by UserPrincipalName
+| order by FailedAttempts desc, UserPrincipalName asc

@@ -1,0 +1,6 @@
+// Purpose: Reconstruct the second victim's attacker-associated activity.
+CloudoraSignIn_CL
+| where UserPrincipalName == "priya.nair@cloudora.io"
+| where IPAddress startswith "102.89."
+| project TimeGenerated, AppDisplayName, IPAddress, ResultType, ResultDescription
+| order by TimeGenerated asc

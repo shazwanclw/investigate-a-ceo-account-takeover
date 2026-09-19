@@ -1,0 +1,5 @@
+// Purpose: Establish Daniel Reeve's normal location and IP history.
+CloudoraSignIn_CL
+| where UserPrincipalName == "daniel.reeve@cloudora.io"
+| summarize SignInCount=count(), FirstSeen=min(TimeGenerated), LastSeen=max(TimeGenerated) by Country, City, IPAddress
+| order by SignInCount desc

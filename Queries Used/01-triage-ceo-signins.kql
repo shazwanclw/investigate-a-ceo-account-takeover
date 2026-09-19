@@ -1,0 +1,7 @@
+// Purpose: Reconstruct the CEO's sign-in story on the incident day.
+// Tables: CloudoraSignIn_CL. ResultType must be ingested as string.
+CloudoraSignIn_CL
+| where UserPrincipalName == "daniel.reeve@cloudora.io"
+| where TimeGenerated between (datetime(2026-08-10) .. datetime(2026-08-11))
+| project TimeGenerated, AppDisplayName, IPAddress, City, Country, ResultType, ResultDescription
+| order by TimeGenerated asc
