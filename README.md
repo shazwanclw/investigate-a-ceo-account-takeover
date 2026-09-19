@@ -45,51 +45,51 @@ Containment plan and detection rule
 
 The incident-day timeline shows the failed sign-ins, successful Lagos session, follow-on app access, and Daniel's later London sign-in.
 
-![CEO incident-day timeline](<Screenshot%20Result/1%20Triage%20the%20Alert.png>)
+![CEO incident-day timeline](<Screenshot%20Result/01%20Triage%20the%20Alert.png>)
 
 ### 2. Baseline the CEO account
 
 Daniel's regular history is London-based; the Lagos event is an outlier tied to the attack window.
 
-![Daniel location baseline](<Screenshot%20Result/2%20Baseline%20the%20account.png>)
+![Daniel location baseline](<Screenshot%20Result/02%20Baseline%20the%20account.png>)
 
 ### 3. Compare the false positive
 
 Omar's Dubai activity provides the comparison case: repeated daytime activity on a familiar device with no failed-password lead-in.
 
-![Omar travel baseline](<Screenshot%20Result/3%20Baseline%20the%20account%20for%20omar.png>)
+![Omar travel baseline](<Screenshot%20Result/03%20Baseline%20the%20account%20for%20omar.png>)
 
 ### 4. Identify the password spray
 
 Failed password activity grouped by IP reveals the many-account pattern behind the successful compromises.
 
-![Password spray by IP](<Screenshot%20Result/4%20Hunt%20for%20credential%20attacks.png>)
+![Password spray by IP](<Screenshot%20Result/04%20Hunt%20for%20credential%20attacks.png>)
 
 ### 5. Confirm the attack window
 
 The attacker infrastructure is active over three consecutive nights before the successful sign-ins.
 
-![Attack window by day](<Screenshot%20Result/5%20Confirm%20attack%20window.png>)
+![Attack window by day](<Screenshot%20Result/05%20Confirm%20attack%20window.png>)
 
 ### 6. Check CEO persistence
 
 Audit activity identifies the MFA registration and email-rule change made after the CEO account was accessed.
 
-![CEO persistence audit events](<Screenshot%20Result/6%20Check%20For%20Persistence.png>)
+![CEO persistence audit events](<Screenshot%20Result/06%20Check%20For%20Persistence.png>)
 
 ### 7. Scope successful attacker activity
 
 Filtering attacker-IP events to successes identifies every account that was accessed.
 
-![Successful attacker sign-ins](<Screenshot%20Result/7%20Check%20Anyone%20else%20compromised.png>)
+![Successful attacker sign-ins](<Screenshot%20Result/07%20Check%20Anyone%20else%20compromised.png>)
 
 ### 8. Investigate the second victim
 
 Priya's attacker-associated activity shows failed attempts across the spray window, then a successful sign-in and SharePoint access.
 
-![Priya timeline](<Screenshot%20Result/8%20Check%20Timeline%20of%20other%20account.png>)
+![Priya timeline](<Screenshot%20Result/08%20Check%20Timeline%20of%20other%20account.png>)
 
-![Priya baseline](<Screenshot%20Result/9%20Baseline%20of%20other%20account.png>)
+![Priya baseline](<Screenshot%20Result/09%20Baseline%20of%20other%20account.png>)
 
 ![Priya audit review](<Screenshot%20Result/10%20Check%20for%20persistence%20for%20other%20account.png>)
 
