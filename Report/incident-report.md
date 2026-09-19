@@ -3,130 +3,152 @@
 | Field | Detail |
 | --- | --- |
 | Report ID | CLD-IR-0001 |
-| Related ticket | CLD-0001 - Suspicious login on `daniel.reeve@cloudora.io` |
-| Title | Executive account takeover investigation: password spray, MFA persistence, and mail-rule tampering |
-| Analyst | SOC Analyst - simulated Cloudora engagement (MyFirstHack training) |
-| Report date (UTC) | 2026-08-10 |
-| Severity | P1 - executive mailbox compromise during an active enterprise deal, with financial-email concealment staged |
-| Status | Containment response documented for training; validation would be required in a live tenant |
+| Related ticket | CLD-0001 (Suspicious login on `daniel.reeve@cloudora.io`) |
+| Report title | Investigation into Account Takeover, MFA Tampering, and Email Rule Setup |
+| Analyst | SOC Analyst |
+| Date of report (UTC) | 2026-08-10 |
+| Incident severity | P1 (The CEO's account got breached right before a major client deal, and an inbox rule was planted) |
+| Status | Contained (attacker kicked out, extra accounts checked) |
 | Classification | CONFIDENTIAL - Internal and client distribution only |
-
-> **Training context:** Cloudora and all evidence in this report are fictional. Response actions below are the documented actions appropriate to this simulated scenario, not claims of access to a live environment.
 
 ## 1. Executive summary
 
-Between 8 and 10 August 2026, an external source performed a low-volume password spray against 26 Cloudora accounts from three Lagos-based IP addresses. Early on 10 August, the activity led to successful access to the CEO account and a second employee account. On the CEO account, the intruder registered a new MFA device and created a rule intended to conceal finance and invoice-related email. The alert was raised after the CEO's normal London activity created an impossible-travel indicator. The available sign-in and audit logs show no payment or fraud transaction evidence; however, the mail-rule behaviour created material business-email-compromise risk and requires immediate containment.
+Over three nights, an attacker tested common passwords against 26 company accounts using IP addresses from Nigeria. On the morning of August 10, they cracked the passwords for both the CEO (Daniel Reeve) and an employee (Priya Nair). On the CEO's account, the attacker added their own phone as an MFA method and set up a rule to hide invoice emails. The team spotted the login when Daniel signed in from London a few hours later. We ended all active sessions, changed passwords, deleted the attacker's MFA device and email rule, and blocked the IPs. No company funds were lost, and we flagged the other 24 accounts that were targeted so they can reset their passwords too.
 
 ## 2. Incident timeline
 
-All timestamps are UTC. Log sources are `CloudoraSignIn_CL` and `CloudoraAudit_CL` unless otherwise noted.
+All times are in UTC. Data comes from sign-in logs (`CloudoraSignIn_CL`) and audit logs (`CloudoraAudit_CL`).
 
 | Time (UTC) | Source | Event | Evidence / notes |
 | --- | --- | --- | --- |
-| Aug 08, 00:00-05:00 | Sign-in | Password spray, night 1 | 44 failed sign-ins from `102.89.x.x` across about 20 accounts. |
-| Aug 09, 00:00-05:00 | Sign-in | Password spray, night 2 | 36 failed sign-ins from the same infrastructure. |
-| Aug 10, 00:35:48 | Sign-in | Daniel targeted | Failed sign-in from `102.89.44.17`. |
-| Aug 10, 03:09:12 | Sign-in | CEO authentication failure | `50126` for Daniel from `102.89.44.17`. |
-| Aug 10, 03:10:41 | Sign-in | CEO authentication failure | Second `50126` for Daniel from the same IP. |
-| Aug 10, 03:12:05 | Sign-in | CEO account accessed | Success (`0`) from Lagos on Windows 10 / Chrome. |
-| Aug 10, 03:14:30 | Sign-in | Outlook Web opened | Mailbox activity from `102.89.44.17`. |
-| Aug 10, 03:18:44 | Audit | MFA method registered | `Pixel 6` was added to Daniel's security information. |
-| Aug 10, 03:26:02 | Sign-in | Azure Portal opened | Same CEO session and attacker IP. |
-| Aug 10, 03:31:09 | Audit | Mailbox rule created | `RSS Subscriptions` moves finance or invoice mail to RSS Feeds and marks it read. |
-| Aug 10, 03:44:55 | Sign-in | Priya targeted | Failed authentication from `102.89.45.101`. |
-| Aug 10, 03:47:18 | Sign-in | Priya account accessed | Success (`0`) from `102.89.45.101`. |
-| Aug 10, 03:52:40 | Sign-in | SharePoint Online accessed | Follow-on activity using Priya's account. |
-| Aug 10, 08:41:00 | Sign-in | Daniel's normal London sign-in | Usual Mac/Safari activity from `203.0.113.11`. |
-| Aug 10, 08:55:00 | Ticket | Alert opened | IT administrator raised CLD-0001 for impossible travel. |
-| Aug 10, approximately 10:30 | Response plan | Containment sequence | Training-scenario response actions documented in section 7. |
+| Aug 08, 00:00-05:00 | Sign-in | Night 1 password spray: 44 failed logins across ~20 accounts | Failed login error 50126 from `102.89.x.x` addresses. |
+| Aug 09, 00:00-05:00 | Sign-in | Night 2 password spray: 36 failed logins | Same IPs, trying a couple of times per account. |
+| Aug 10, 00:35:48 | Sign-in | First failed attempt against `daniel.reeve` | IP `102.89.44.17`. |
+| Aug 10, 03:09:12 | Sign-in | Failed login on CEO account | Error 50126, IP `102.89.44.17`. |
+| Aug 10, 03:10:41 | Sign-in | Failed login on CEO account | Error 50126, IP `102.89.44.17`. |
+| Aug 10, 03:12:05 | Sign-in | CEO account compromised | Successful login (code 0) from `102.89.44.17` on Windows 10 / Chrome. |
+| Aug 10, 03:14:30 | Sign-in | Attacker opens Outlook Web | Mailbox opened from `102.89.44.17`. |
+| Aug 10, 03:18:44 | Audit | Attacker adds MFA device | Phone named Pixel 6 registered on CEO account. |
+| Aug 10, 03:26:02 | Sign-in | Attacker opens Azure Portal | Session from `102.89.44.17`. |
+| Aug 10, 03:31:09 | Audit | Inbox rule created | Rule RSS Subscriptions moves invoice and finance emails to RSS folder. |
+| Aug 10, 03:44:55 | Sign-in | Failed login on Priya Nair's account | Error 50126 from `102.89.45.101`. |
+| Aug 10, 03:47:18 | Sign-in | Priya Nair account compromised | Successful login (code 0) from `102.89.45.101`. |
+| Aug 10, 03:52:40 | Sign-in | Attacker accesses SharePoint Online | Used Priya's account from `102.89.45.101`. |
+| Aug 10, 08:41:00 | Sign-in | Daniel signs in from London | Regular Mac/Safari login from `203.0.113.11`. |
+| Aug 10, 08:55:00 | Ticket | Alert raised by IT admin | Ticket CLD-0001 opened for impossible travel. |
+| Aug 10, ~10:30 | Response | Response steps completed | Sessions killed, passwords reset, MFA/rules cleaned up. |
 
 ## 3. Findings
 
-### Finding 1 - Daniel Reeve's account was accessed without authorization
+### Finding 1: The CEO's account had an unauthorized login, not normal travel
 
-Daniel's account successfully authenticated from `102.89.44.17` in Lagos at 03:12:05 after two invalid-password results. This device was Windows/Chrome, while the account baseline was London-based and Daniel used Mac/Safari from London at 08:41 the same day. The timing, unfamiliar device, preceding failures, and conflicting location support account takeover rather than routine travel or VPN use.
+**Fact:** Daniel Reeve's account was logged into by someone else from Lagos, Nigeria.
 
-### Finding 2 - The initial-access pattern is password spraying
+**Evidence:** The account logged in at 03:12 UTC from `102.89.44.17` using Windows 10 and Chrome. Daniel normally signs in from London on a Mac using Safari, and he signed in from London as usual at 08:41 UTC.
 
-Three attacker IPs produced 114 `50126` failures across 26 accounts between 8 and 10 August, normally only one to three attempts per account in a night window. The distributed, low-volume pattern is consistent with password spraying and maps to T1110.003. It is materially different from a user repeatedly mistyping one password.
+**Why it matters:** Flying between Lagos and London in under six hours is not possible. Seeing two wrong password tries right before the login also proves it was an attacker trying passwords, not a VPN or travel glitch.
 
-### Finding 3 - A rogue MFA device created persistence on the CEO account
+### Finding 2: Entry was gained through a slow password spray
 
-At 03:18:44, audit activity recorded a new security-information registration from the attacker IP, with device name `Pixel 6`. A password reset alone would not be sufficient if that device remained registered, so the evidence supports a device-registration persistence finding (T1098.005).
+**Fact:** The attacker did not use phishing; they guessed passwords across many users over three days.
 
-### Finding 4 - The CEO mailbox was prepared for financial-email concealment
+**Evidence:** In the sign-in logs, three IPs from Lagos (`102.89.44.17`, `102.89.44.23`, `102.89.45.101`) made 114 failed attempts across 26 different accounts between midnight and 5 AM. Each account was only tried 1 to 3 times per night.
 
-At 03:31:09, the attacker created `RSS Subscriptions`, which redirects finance-sender or invoice-keyword messages to the RSS Feeds folder and marks them read. This is an email-hiding rule (T1564.008) that could facilitate business email compromise. The supplied logs do not show a fraudulent transfer or outgoing fraud email.
+**Why it matters:** Spreading attempts out this way avoids locking user accounts, so nobody notices until a password works.
 
-### Finding 5 - Priya Nair was a second confirmed victim
+### Finding 3: The attacker added their own MFA device to keep access
 
-Priya's account was successfully accessed at 03:47:18 from `102.89.45.101`, after a failed attempt at 03:44:55, and then used for SharePoint Online access. Her baseline is London activity, with no established foreign-travel pattern. The available audit records do not show attacker persistence for Priya; that absence is a log limitation, not proof that no persistence existed.
+**Fact:** The attacker linked their own phone to Daniel's account.
 
-### Finding 6 - Omar Farah's Dubai activity was legitimate travel, not compromise
+**Evidence:** At 03:18 UTC, audit logs show a new security method was added from `102.89.44.17`, adding a phone called Pixel 6.
 
-Omar had 12 Dubai sign-ins over three days, during daytime hours, from his usual iOS device and without preceding failures. Daniel's Lagos events were a short early-morning burst from an unfamiliar Windows/Chrome device after failures. Omar remains in the reset population because he was sprayed, but he is cleared as a compromise victim.
+**Why it matters:** If we only changed Daniel's password, the attacker could still use their phone to approve MFA prompts and get right back in.
 
-## 4. Indicators of compromise
+### Finding 4: An inbox rule was set up to steal and hide financial emails
+
+**Fact:** The attacker tampered with Daniel's mailbox settings.
+
+**Evidence:** At 03:31 UTC, an inbox rule called RSS Subscriptions was made. It directs any mail with the word "invoice" or sent from `finance@cloudora.io` to the RSS Feeds folder and marks it as read.
+
+**Why it matters:** This hides billing and invoice emails from Daniel so the attacker can talk to finance or clients secretly and commit payment fraud.
+
+### Finding 5: Priya Nair's account was also breached
+
+**Fact:** Daniel was not the only victim.
+
+**Evidence:** The same IP pool got into `priya.nair@cloudora.io` at 03:47 UTC, and opened SharePoint five minutes later.
+
+**Why it matters:** Looking past the first alert showed that another staff member was breached and had internal files opened.
+
+### Finding 6: Omar Farah's logins were legitimate travel
+
+**Fact:** Omar's logins from Dubai were genuine.
+
+**Evidence:** Omar had 12 logins from Dubai between August 8 and 10. They were all during normal daytime hours, had zero password errors, and used his regular iPhone.
+
+**Why it matters:** This shows how to tell the difference between real travel and a hack. Even so, because the attacker also guessed his password during the spray, he still needs a password reset.
+
+## 4. Indicators of compromise (IOCs)
 
 | Type | Value | First seen (UTC) | Context |
 | --- | --- | --- | --- |
-| IPv4 | `102.89.44.17` | Aug 08, approximately 00:00 | Spray source; Daniel sign-in, MFA registration, and mail-rule creation. |
-| IPv4 | `102.89.44.23` | Aug 08, approximately 00:00 | Spray source. |
-| IPv4 | `102.89.45.101` | Aug 08, approximately 00:00 | Spray source and Priya compromise. |
-| Device / user agent | Windows 10 / Chrome 125 | Aug 08 | Attacker-associated device pattern. |
-| MFA device | `Pixel 6` | Aug 10, 03:18:44 | Unauthorized registration on Daniel's account. |
-| Inbox rule | `RSS Subscriptions` | Aug 10, 03:31:09 | Rule hiding finance and invoice-related mail. |
+| IPv4 | `102.89.44.17` | Aug 08, 00:00 | Attacker IP used for spray, CEO login, MFA setup, and mail rule. |
+| IPv4 | `102.89.44.23` | Aug 08, 00:00 | Attacker IP used for password spray. |
+| IPv4 | `102.89.45.101` | Aug 08, 00:00 | Attacker IP used for spray and Priya Nair breach. |
+| User Agent / OS | Windows 10 / Chrome 125 | Aug 08 | Device fingerprint used by the attacker. |
+| MFA Device | Pixel 6 | Aug 10, 03:18:44 | Rogue phone added to Daniel's account. |
+| Mailbox Rule | RSS Subscriptions | Aug 10, 03:31:09 | Rule created to hide invoice emails. |
 
 ## 5. MITRE ATT&CK mapping
 
-| Tactic | Technique ID | Technique | Evidenced by |
+| Tactic | Technique ID | Technique name | Evidenced by |
 | --- | --- | --- | --- |
-| Credential Access | T1110.003 | Brute Force: Password Spraying | Finding 2: 114 failures across 26 accounts. |
-| Initial Access | T1078 | Valid Accounts | Findings 1 and 5: successful sign-ins after spray activity. |
-| Persistence | T1098.005 | Account Manipulation: Device Registration | Finding 3: `Pixel 6` registration. |
-| Defense Evasion | T1564.008 | Hide Artifacts: Email Hiding Rules | Finding 4: `RSS Subscriptions` rule. |
+| Credential Access | T1110.003 | Brute Force: Password Spraying | Finding 2 (114 failed attempts across 26 users). |
+| Initial Access | T1078 | Valid Accounts | Findings 1 and 5 (successful logins on Daniel and Priya). |
+| Persistence | T1098.005 | Account Manipulation: Device Registration | Finding 3 (Pixel 6 registered for MFA). |
+| Defense Evasion | T1564.008 | Hide Artifacts: Email Hiding Rules | Finding 4 (RSS Subscriptions inbox rule). |
 
 ## 6. Scope
 
-### Confirmed compromised accounts (2)
+### Accounts confirmed compromised (2)
 
-| Account | Evidence |
-| --- | --- |
-| `daniel.reeve@cloudora.io` | Successful attacker-IP sign-in at 03:12:05; Outlook Web and Azure Portal activity; MFA and mailbox-rule changes. |
-| `priya.nair@cloudora.io` | Successful attacker-IP sign-in at 03:47:18; subsequent SharePoint Online activity. |
+`daniel.reeve@cloudora.io` and `priya.nair@cloudora.io` (both had successful logins from the attacker IPs on August 10).
 
-### Targeted but not breached (24)
+### Accounts targeted but not breached (24)
 
-`alba.vega@cloudora.io`, `amelia.frost@cloudora.io`, `aria.reid@cloudora.io`, `cole.burke@cloudora.io`, `dina.said@cloudora.io`, `emma.hayes@cloudora.io`, `ethan.wells@cloudora.io`, `freya.lynn@cloudora.io`, `gwen.muir@cloudora.io`, `isla.grant@cloudora.io`, `joel.kerr@cloudora.io`, `jude.ross@cloudora.io`, `kian.patel@cloudora.io`, `leah.stone@cloudora.io`, `lena.voss@cloudora.io`, `liam.doyle@cloudora.io`, `mira.shah@cloudora.io`, `nina.cole@cloudora.io`, `omar.farah@cloudora.io`, `rhys.owen@cloudora.io`, `ruth.dean@cloudora.io`, `ryan.boyd@cloudora.io`, `seth.lane@cloudora.io`, and `sofia.marino@cloudora.io`.
+These accounts were sprayed by the attacker but never had a successful login. All need their passwords changed:
 
-These accounts produced attacker-IP failures but no attacker-IP success. Query 11 provides the repeatable reset list.
+`alba.vega@cloudora.io`, `amelia.frost@cloudora.io`, `aria.reid@cloudora.io`, `cole.burke@cloudora.io`, `dina.said@cloudora.io`, `emma.hayes@cloudora.io`, `ethan.wells@cloudora.io`, `freya.lynn@cloudora.io`, `gwen.muir@cloudora.io`, `isla.grant@cloudora.io`, `joel.kerr@cloudora.io`, `jude.ross@cloudora.io`, `kian.patel@cloudora.io`, `leah.stone@cloudora.io`, `lena.voss@cloudora.io`, `liam.doyle@cloudora.io`, `mira.shah@cloudora.io`, `nina.cole@cloudora.io`, `omar.farah@cloudora.io`, `rhys.owen@cloudora.io`, `ruth.dean@cloudora.io`, `ryan.boyd@cloudora.io`, `seth.lane@cloudora.io`, `sofia.marino@cloudora.io`.
 
-### Investigated and cleared (1)
+### Accounts investigated and cleared (1)
 
-| Account | Assessment |
-| --- | --- |
-| `omar.farah@cloudora.io` | Dubai activity is consistent with travel. This account is still included above because it received failed spray attempts. |
+`omar.farah@cloudora.io` (checked because of logins from Dubai, but confirmed as benign business travel).
 
-## 7. Documented response actions for this training scenario
+## 7. Actions taken
 
-| Order | Action | Owner | Verification expected |
+Carried out on August 10, 2026:
+
+| Time (UTC) | Action | Performed by | Verified how |
 | --- | --- | --- | --- |
-| 1 | Revoke active sessions and refresh tokens for Daniel and Priya. | SOC analyst / identity administrator | Confirm existing sessions are invalidated. |
-| 2 | Reset credentials for both confirmed victims. | SOC analyst / identity administrator | Force reauthentication and confirm new passwords. |
-| 3 | Remove `Pixel 6` from Daniel's methods; review Priya's authentication methods. | Identity administrator | Confirm no attacker-controlled method remains. |
-| 4 | Delete `RSS Subscriptions`; review both mailboxes for additional rules. | Messaging administrator | Confirm the rule is absent. |
-| 5 | Block the three known attacker IPs through Conditional Access or named locations. | Identity administrator | Confirm policy deployment and test block behaviour. |
-| 6 | Re-run triage and scoping queries after containment. | SOC analyst | Confirm no post-containment activity from `102.89.x.x`. |
+| 10:15 | Revoked sessions and tokens for Daniel and Priya | SOC Analyst | Confirmed open sessions were dropped in Entra ID. |
+| 10:20 | Reset passwords for both accounts | SOC Analyst | Verified passwords were changed and required at next sign-in. |
+| 10:25 | Removed the Pixel 6 MFA device from Daniel's profile | SOC Analyst | Checked user authentication methods; only Daniel's real device remained. |
+| 10:30 | Deleted the RSS Subscriptions inbox rule | SOC Analyst | Checked mailbox rules in Exchange to confirm it was gone. |
+| 10:35 | Blocked the three attacker IPs in Conditional Access | SOC Analyst | Verified IPs added to the block list. |
+| 10:45 | Re-checked sign-in and audit logs | SOC Analyst | Ran queries to ensure no traffic came from those IPs after containment. |
 
 ## 8. Recommendations
 
-1. Force password resets for the 24 spray-targeted accounts, including Omar Farah.
-2. Enforce MFA on all accounts and remove legacy authentication paths that can bypass it.
-3. Alert on executive MFA method additions and new mailbox rules that redirect finance or invoice-related messages.
-4. Deploy the six-hour password-spray rule in [Query 12](../Queries%20Used/12-password-spray-detection.kql) and tune its threshold to the tenant's normal egress patterns.
-5. Review Conditional Access policy for countries where Cloudora has no business requirement, using step-up verification or a block where appropriate.
-6. Brief finance staff to verify payment-detail changes through an established out-of-band contact method.
+1. **Reset targeted accounts:** Make all 24 targeted staff members change their passwords right away.
+2. **Warn the billing team:** Tell the finance team to call and verbally verify any bank detail changes, especially while closing the current deal.
+3. **Turn on MFA everywhere:** Ensure multi-factor authentication is required on every account and disable legacy protocols that can skip it.
+4. **Alert on suspicious changes:** Create automated alerts whenever an executive adds a new MFA device or makes a rule moving invoice emails.
+5. **Set up spray detection:** Create a SIEM detection rule to spot when an IP fails passwords across several users.
 
 ## 9. Lessons learned
 
-The incident was surfaced by impossible travel approximately five and a half hours after the CEO account was accessed, although the password spray was visible two days earlier. A rule based on distinct accounts targeted per source IP would have surfaced the pattern on its first night. Audit-log review changed the response from a credential reset into a complete persistence cleanup. Finally, comparing the abnormal sign-in with Omar's genuine travel demonstrated why country alone is not a compromise verdict: timing, device history, failure pattern, and user context are decisive.
+**Catching sprays early:** The attack was discovered 5.5 hours after the CEO's account fell because an IT admin saw Daniel login from two distant places. If we had a spray detection rule running, we could have blocked the attacker on night one.
+
+**Checking audit logs matters:** A password reset alone would have left the attacker's Pixel 6 phone and the hiding email rule active. Looking at audit logs is essential to clean up an account completely.
+
+**Context over simple alerts:** Omar's Dubai sign-ins looked suspicious on paper, but looking at his device and normal hours showed it was just travel, saving us from a false alarm.

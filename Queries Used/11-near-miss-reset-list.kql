@@ -1,3 +1,5 @@
+// Purpose: Find accounts targeted by attacker infrastructure that recorded failures but no successful attacker sign-in.
+// The executable query below is identical to the query used for the submitted screenshot.
 CloudoraSignIn_CL
 | where IPAddress startswith "102.89."
 | summarize
